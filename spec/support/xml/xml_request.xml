@@ -1,0 +1,7 @@
+<BeQuickproduct="conduit">
+  <action name="foo">
+    <foo>value for foo</foo>
+    <bar>value for bar</bar>
+    <baz>value for baz</baz>
+  </action>
+</BeQuick>

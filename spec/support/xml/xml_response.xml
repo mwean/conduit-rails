@@ -1,0 +1,3 @@
+<BeQuick product="conduit">
+  <response status="success" action="foo" />
+</BeQuick>
