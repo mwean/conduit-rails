@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount ConduitRails::Engine => "/conduit"
+  mount Conduit::Engine => "/conduit"
 end
