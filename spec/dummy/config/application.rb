@@ -7,7 +7,7 @@ require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
-require 'conduit_rails'
+require 'conduit-rails'
 
 module Dummy
   class Application < Rails::Application
