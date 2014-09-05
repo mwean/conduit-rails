@@ -99,6 +99,8 @@ module Conduit
       def notify_subscribers
         last_response = responses.last
         subscribers.each do |subscriber|
+          next unless subscriber.respond_to?(:after_conduit_update)
+
           subscriber.after_conduit_update(action,
             last_response.parsed_content)
         end
