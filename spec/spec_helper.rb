@@ -9,6 +9,7 @@ require 'database_cleaner'
 require 'shoulda/matchers'
 require 'rspec/rails'
 require 'excon'
+require 'conduit'
 
 # Load all of the _spec.rb files
 #
