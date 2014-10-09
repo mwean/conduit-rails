@@ -21,7 +21,7 @@ module Conduit
     # Hooks
 
     after_initialize  :set_defaults
-    after_update      :notify_subscribers
+    after_update      :notify_subscribers, unless: :connection_error?
 
     # Scopes
 
@@ -46,8 +46,10 @@ module Conduit
     def perform_request
       return unless response = raw.perform
       responses.create(content: response.body)
-    rescue Excon::Errors::Timeout
+    rescue Conduit::TimeOut
       update_attributes(status: :timeout)
+    rescue Conduit::ConnectionError
+      update_attributes(status: :error)
     end
 
     # Allow creation of subscriptions through the
@@ -80,7 +82,11 @@ module Conduit
       # Set some default values
       #
       def set_defaults
-        self.status ||= "open"
+        self.status ||= 'open'
+      end
+
+      def connection_error?
+        %w(timeout error).include?(status.to_s)
       end
 
       # Generate a unique storage key
@@ -88,7 +94,7 @@ module Conduit
       #
       def generate_storage_path
         update_column(:file, File.join("#{id}".reverse!,
-          driver.to_s, action.to_s, "request.xml"))
+          driver.to_s, action.to_s, 'request.xml'))
       end
 
       # Notify the requestable that our status
@@ -97,7 +103,7 @@ module Conduit
       # requestable instance
       #
       def notify_subscribers
-        last_response = responses.last
+        return unless last_response = responses.last
         subscribers.each do |subscriber|
           next unless subscriber.respond_to?(:after_conduit_update)
 
@@ -112,6 +118,5 @@ module Conduit
         @raw ||= Conduit::Util.find_driver(driver,
           action).new(options.symbolize_keys!)
       end
-
   end
 end
