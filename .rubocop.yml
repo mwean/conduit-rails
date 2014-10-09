@@ -1,0 +1,85 @@
+# This is the default configuration file. Enabling and disabling is configured
+# in separate files. This file adds all other parameters apart from Enabled.
+
+AllCops:
+  Include:
+    - '**/*.gemspec'
+    - '**/Rakefile'
+  Exclude:
+    - faye/vendor/**/*
+    - vendor/**/*
+    - db/**/*
+  RunRailsCops: true
+
+LineLength:
+  Description: 'Limit lines to 100 characters.'
+  Max: 100
+  Enabled: true
+
+AlignHash:
+  Description: Align the elements of a hash literal if they span more than one line.
+  EnforcedLastArgumentHashStyle: ignore_implicit
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+  Enabled: false
+
+AlignParameters:
+  EnforcedStyle: with_first_parameter
+  SupportedStyles:
+    - with_first_parameter
+    - with_fixed_indentation
+  Enabled: false
+
+Documentation:
+  Description: 'Document classes and non-namespace modules.'
+  Enabled: false
+
+AndOr:
+  Description: 'Use &&/|| instead of and/or.'
+  Enabled: false
+
+EmptyLinesAroundBody:
+  Description: "Keeps track of empty lines around expression bodies."
+  Enabled: false
+
+EndAlignment:
+  Description: 'Align ends correctly.'
+  Enabled: true
+  AlignWith: variable
+
+CollectionMethods:
+  Description: 'Preferred collection methods.'
+  Enabled: true
+  PreferredMethods:
+    collect:  'map'
+    collect!: 'map!'
+    reduce:   'inject'
+    detect:   'find'
+    find_all: 'select'
+
+AssignmentInCondition:
+  Description: "Don't use assignment in conditions."
+  Enabled: false
+
+DoubleNegation:
+  Description: 'Checks for uses of double negation (!!).'
+  Enabled: false
+
+SingleSpaceBeforeFirstArg:
+  Description: 'Checks that exactly one space is used between a method name and the first argument for method calls without parentheses.'
+  Enabled: false
+
+DotPosition:
+  Description: 'Checks the position of the dot in multi-line method calls.'
+  Enabled: false
+
+ClassAndModuleChildren:
+  Description: 'Checks style of children classes and modules.'
+  Enabled: false
+
+RescueModifier:
+  Description: 'Avoid using rescue in modifier form'
+  Enabled: false
+
+StringLiterals:
+  EnforcedStyle: single_quotes
