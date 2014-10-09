@@ -48,8 +48,10 @@ module Conduit
       responses.create(content: response.body)
     rescue Conduit::TimeOut
       update_attributes(status: :timeout)
+      nil
     rescue Conduit::ConnectionError
       update_attributes(status: :error)
+      nil
     end
 
     # Allow creation of subscriptions through the
