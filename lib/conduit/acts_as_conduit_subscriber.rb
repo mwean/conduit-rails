@@ -20,19 +20,6 @@ module Conduit
     # is called on an ActiveRecord Model
     #
     module LocalInstanceMethods
-
-      # Fire this method after the last conduit
-      # request has been updated
-      #
-      # NOTE: This could probably be better
-      #       handled by observers, or a
-      #       custom callback.
-      #
-      def after_conduit_update(action, parsed_response)
-        # This method should be overriden
-        # on the requestable object
-      end
-
     end
 
   end
