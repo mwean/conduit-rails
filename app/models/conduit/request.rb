@@ -93,6 +93,7 @@ module Conduit
     end
 
     def subscribe(responder_type, **responder_options)
+      raise StandardError.new("Responder must implement process_conduit_response") unless responder_type.respond_to?(:process_conduit_response)
       self.subscriptions.create(responder_type: responder_type.to_s, responder_options: responder_options)
     end
 
