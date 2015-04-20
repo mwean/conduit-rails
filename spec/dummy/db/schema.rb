@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140305202729) do
+ActiveRecord::Schema.define(version: 20150417133935) do
 
   create_table "conduit_requests", force: true do |t|
     t.string   "driver"
@@ -38,6 +38,8 @@ ActiveRecord::Schema.define(version: 20140305202729) do
     t.string   "subscriber_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "responder_type"
+    t.text     "responder_options"
   end
 
   add_index "conduit_subscriptions", ["request_id"], name: "index_conduit_subscriptions_on_request_id"

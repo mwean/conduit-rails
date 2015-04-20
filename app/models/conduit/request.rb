@@ -13,10 +13,14 @@ module Conduit
     has_many :responses,   dependent: :destroy
     has_many :subscriptions, autosave: true
 
+    has_many   :children, class_name: 'Conduit::Request', foreign_key: :parent_id
+    belongs_to :parent,   class_name: 'Conduit::Request'
+
     # Validations
 
     validates :driver, presence: true
     validates :action, presence: true
+    validate  :assure_supported_driver_and_action
 
     # Hooks
 
@@ -79,7 +83,38 @@ module Conduit
       subscriptions.map(&:subscriber)
     end
 
+    def callback_url=(callback_url)
+      options.merge!(callback_url: callback_url)
+      attribute_will_change!(:options)
+    end
+
+    def callback_url
+      options[:callback_url]
+    end
+
+    def subscribe(responder_type, **responder_options)
+      self.subscriptions.create(responder_type: responder_type.to_s, responder_options: responder_options)
+    end
+
     private
+
+      def conduit_driver
+        @conduit_driver ||= Conduit::Util.find_driver(driver)
+      end
+
+      def assure_supported_driver_and_action
+        unless conduit_driver.present?
+          errors.add(:driver, "#{driver} is not a supported driver")
+          return false
+        end
+
+        unless conduit_driver.actions.include?(action.to_sym)
+          errors.add(:action, "not supported by the #{driver} driver")
+          return false
+        end
+      end
+
+
 
       # Set some default values
       #
@@ -106,11 +141,9 @@ module Conduit
       #
       def notify_subscribers
         return unless last_response = responses.last
-        subscribers.each do |subscriber|
-          next unless subscriber.respond_to?(:after_conduit_update)
-
-          subscriber.after_conduit_update(action,
-            last_response.parsed_content)
+        subscriptions.each do |subscription|
+          subscription.handle_conduit_response(action, last_response)
+          # What to do if one of them fail? Keep going? Cry about it?
         end
       end
 
