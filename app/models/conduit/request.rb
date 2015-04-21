@@ -144,7 +144,7 @@ module Conduit
         return unless last_response = responses.last
         subscriptions.each do |subscription|
           subscription.handle_conduit_response(action, last_response)
-          # What to do if one of them fail? Keep going? Cry about it?
+          # TODO Deal with failures here (at least determine the behavior if one of them throws an exception)
         end
       end
 
