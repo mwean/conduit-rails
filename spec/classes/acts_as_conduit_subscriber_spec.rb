@@ -5,12 +5,6 @@ require 'spec_helper'
 class MySubscriber < ActiveRecord::Base
   acts_as_conduit_subscriber
 
-  # Update the `updated_at` timestamp
-  # so we know this has been called
-  #
-  def after_conduit_update(action, parsed_response)
-    self.update_column(:updated_at, 1.day.from_now)
-  end
 end
 
 describe MySubscriber do
@@ -48,14 +42,6 @@ describe MySubscriber do
       @obj.conduit_requests.create(driver: :my_driver, action: :foo,
         options: request_attributes).perform_request
     end
-
-    describe '#after_conduit_update' do
-      it 'gets called after a request is updated' do
-        @obj.reload # Bust the cache
-        @obj.updated_at.should_not == @obj.created_at
-      end
-    end
-
   end
 
 end

@@ -47,4 +47,19 @@ describe Conduit::Request do
     end
   end
 
+  context "with a subscriber" do
+    let (:subscription) { Conduit::Subscription.new }
+    let (:response) { subject.responses.create(content: "some content") }
+
+    before :each do
+      subject.subscriptions << subscription
+    end
+
+    it "it notifies the subscriber with response" do
+      expect(subscription).to receive(:handle_conduit_response).with(subject.action, response)
+      subject.save
+    end
+
+  end
+
 end

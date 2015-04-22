@@ -16,17 +16,16 @@ module Conduit
 
     # Hooks
 
-    after_create :report_response_status
+    after_commit :report_response_status, on: :create
 
     # Methods
 
-    delegate :driver, :action, to: :request
+    delegate :subscribers, :callback_subscribers, :callback_url, :driver, :action, to: :request
 
     # Raw access to the parser instance
     #
     def parsed_content
-      @parsed_content ||= Conduit::Util.find_driver(driver, action, 'parser').
-        new(content)
+      @parsed_content ||= Conduit::Util.find_driver(driver, action, 'parser').new(content)
     end
 
     private
