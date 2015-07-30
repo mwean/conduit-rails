@@ -6,6 +6,7 @@ ENV["RAILS_ENV"] = "test"
 #
 require File.expand_path("../dummy/config/environment",__FILE__)
 require 'database_cleaner'
+require 'test_after_commit'
 require 'shoulda/matchers'
 require 'rspec/rails'
 require 'excon'

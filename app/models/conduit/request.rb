@@ -25,7 +25,7 @@ module Conduit
     # Hooks
 
     after_initialize  :set_defaults
-    after_update      :notify_subscribers, unless: :connection_error?
+    after_commit      :notify_subscribers, on: [:update]
 
     # Scopes
 
@@ -141,10 +141,13 @@ module Conduit
       # requestable instance
       #
       def notify_subscribers
+        return unless should_notify_subscribers?
         return unless last_response = responses.last
+
         subscriptions.each do |subscription|
-          subscription.handle_conduit_response(action, last_response)
-          # TODO Deal with failures here (at least determine the behavior if one of them throws an exception)
+          with_logged_exceptions do
+            subscription.handle_conduit_response(action, last_response)
+          end
         end
       end
 
@@ -153,6 +156,19 @@ module Conduit
       def raw
         @raw ||= Conduit::Util.find_driver(driver,
           action).new(options.symbolize_keys!)
+      end
+
+      def should_notify_subscribers?
+        !connection_error? && previous_changes.include?(:status)
+      end
+
+      def with_logged_exceptions(&block)
+        begin
+          yield
+        rescue StandardError => e
+          Rails.logger.error e.message
+          Rails.logger.error e.backtrace.join("\n")
+        end
       end
   end
 end
