@@ -55,9 +55,27 @@ describe Conduit::Request do
       subject.subscriptions << subscription
     end
 
-    it "it notifies the subscriber with response" do
+    it 'it notifies the subscriber with response' do
       expect(subscription).to receive(:handle_conduit_response).with(subject.action, response)
+      subject.status = 'success'
       subject.save
+    end
+
+    context 'with exception in subscriber' do
+      let (:second_subscription) { Conduit::Subscription.new }
+
+      before do
+        subject.subscriptions << second_subscription
+      end
+
+      it 'notifies subscribers in the face of adversity' do
+        expect(subscription).to receive(:handle_conduit_response).with(subject.action, response).and_raise(StandardError, "boom")
+        expect(second_subscription).to receive(:handle_conduit_response).with(subject.action, response)
+        expect(Rails.logger).to receive(:error).twice
+
+        subject.status = 'success'
+        subject.save
+      end
     end
 
   end
