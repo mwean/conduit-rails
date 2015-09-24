@@ -16,7 +16,9 @@ module Conduit
 
     # Hooks
 
-    after_commit :report_response_status, on: :create
+    after_commit :report_response_status,  on: :create
+    after_commit :set_last_error_message,  if: :error_response?
+    after_commit :wipe_last_error_message, unless: :error_response?
 
     # Methods
 
@@ -48,6 +50,23 @@ module Conduit
     def report_response_status
       status = parsed_content.response_status
       request.update_attributes(status: status)
+    end
+
+    def error_response?
+      status = parsed_content.response_status
+      ['error', 'failure'].include?(status)
+    end
+
+    def set_last_error_message
+      errors = parsed_content.try(:response_errors)
+      errors = errors.kind_of?(Array) ? errors.join(',') : errors.to_s
+      errors = "An unknown #{parsed_content.response_status} occurred" unless errors.present?
+
+      request.update_attributes(last_error_message: errors)
+    end
+
+    def wipe_last_error_message
+      request.update_attributes(last_error_message: nil) if request.last_error_message.present?
     end
   end
 end

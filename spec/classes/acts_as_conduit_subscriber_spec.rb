@@ -11,7 +11,7 @@ describe MySubscriber do
 
   # Silly magic to create an empty table for MySubscriber
   #
-  before(:suite) do
+  before(:each) do
     ActiveRecord::Migration.tap do |a|
       a.verbose = false
       a.create_table(:my_subscribers) do |t|
@@ -22,7 +22,7 @@ describe MySubscriber do
 
   # Silly magic to remove an empty table for MySubscriber
   #
-  after(:suite) do
+  after(:each) do
     ActiveRecord::Migration.tap do |a|
       a.verbose = false
       a.drop_table(:my_subscribers)
