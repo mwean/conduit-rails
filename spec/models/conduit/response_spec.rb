@@ -49,7 +49,7 @@ describe Conduit::Response do
     end
   end
 
-  describe '.set_last_error_on_request' do
+  describe '.set_last_error_message' do
     it 'should set the last error message on the conduit request' do
       OpenStruct.new(response_status: 'error', response_errors: 'boom')
       allow_any_instance_of(Conduit::Response).to receive(:error_response?).and_return(true)
@@ -60,4 +60,16 @@ describe Conduit::Response do
       expect(@request.reload.last_error_message).to eql 'boom'
     end
   end
+
+  describe '.wipe_last_error_message' do
+    before { @request.update_attributes(last_error_message: 'boom') }
+
+    it 'should wip the last error message when its not a error' do
+      expect(@request.last_error_message).to eql 'boom'
+
+      @request.responses.create(content: "some content")
+
+      expect(@request.reload.last_error_message).to eql nil
+    end
+  end  
 end
