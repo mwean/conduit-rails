@@ -17,6 +17,7 @@ module Conduit
     # Hooks
 
     after_commit :report_response_status, on: :create
+    after_commit :set_last_error_on_request, if: :error_response?
 
     # Methods
 
@@ -48,6 +49,18 @@ module Conduit
     def report_response_status
       status = parsed_content.response_status
       request.update_attributes(status: status)
+    end
+
+    def error_response?
+      status = parsed_content.response_status
+      ['error', 'failure'].include?(status)
+    end
+
+    def set_last_error_on_request
+      errors = parsed_content.try(:response_errors)
+      errors = errors.kind_of?(Array) ? errors.join(',') : errors.to_s
+
+      request.update_attributes(last_error_message: errors) if errors
     end
   end
 end
