@@ -144,7 +144,8 @@ module Conduit
         return unless should_notify_subscribers?
         return unless last_response = responses.last
 
-        subscriptions.each do |subscription|
+        to_notify = (subscriptions + (self.respond_to?(:subscribers) ? subscribers : [])).uniq
+        to_notify.each do |subscription|
           with_logged_exceptions do
             subscription.handle_conduit_response(action, last_response)
           end
