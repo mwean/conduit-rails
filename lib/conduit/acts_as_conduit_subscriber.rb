@@ -20,7 +20,12 @@ module Conduit
     # is called on an ActiveRecord Model
     #
     module LocalInstanceMethods
+       def after_conduit_update(action, parsed_response)
+         # this is used to know if we're making a stand-alone or a attached request in atom
+       end
+
     end
+
 
   end
 end
