@@ -102,7 +102,9 @@ module Conduit
     private
 
     def set_transaction_id
-      self.transaction_id ||= RequestStore.store[:transaction_id] || Thread.current[:transaction_id]
+      if respond_to? :transaction_id
+        self.transaction_id ||= RequestStore.store[:transaction_id] || Thread.current[:transaction_id]
+      end
       true
     end
 
