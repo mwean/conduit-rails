@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150417133935) do
+ActiveRecord::Schema.define(version: 20151201151542) do
 
   create_table "conduit_requests", force: true do |t|
     t.string   "driver"
@@ -21,6 +21,8 @@ ActiveRecord::Schema.define(version: 20150417133935) do
     t.string   "status"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "last_error_message"
+    t.string   "transaction_id"
   end
 
   create_table "conduit_responses", force: true do |t|

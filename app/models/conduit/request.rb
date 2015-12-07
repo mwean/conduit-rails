@@ -27,6 +27,8 @@ module Conduit
     after_initialize  :set_defaults
     after_commit      :notify_subscribers, on: [:update]
 
+    before_save       :set_transaction_id, on: [:create]
+
     # Scopes
 
     scope :by_action, -> (actions) { where(action: actions) }
@@ -99,77 +101,85 @@ module Conduit
 
     private
 
-      def conduit_driver
-        @conduit_driver ||= Conduit::Util.find_driver(driver)
+    def set_transaction_id
+      if respond_to? :transaction_id
+        self.transaction_id ||= RequestStore.store[:transaction_id] || Thread.current[:transaction_id]
+      end
+      true
+    end
+
+
+    def conduit_driver
+      @conduit_driver ||= Conduit::Util.find_driver(driver)
+    end
+
+    def assure_supported_driver_and_action
+      unless conduit_driver.present?
+        errors.add(:driver, "#{driver} is not a supported driver")
+        return false
       end
 
-      def assure_supported_driver_and_action
-        unless conduit_driver.present?
-          errors.add(:driver, "#{driver} is not a supported driver")
-          return false
-        end
-
-        unless conduit_driver.actions.include?(action.to_sym)
-          errors.add(:action, "not supported by the #{driver} driver")
-          return false
-        end
+      unless conduit_driver.actions.include?(action.to_sym)
+        errors.add(:action, "not supported by the #{driver} driver")
+        return false
       end
+    end
 
 
 
-      # Set some default values
-      #
-      def set_defaults
-        self.status ||= 'open'
-      end
+    # Set some default values
+    #
+    def set_defaults
+      self.status ||= 'open'
+    end
 
-      def connection_error?
-        %w(timeout error).include?(status.to_s)
-      end
+    def connection_error?
+      %w(timeout error).include?(status.to_s)
+    end
 
-      # Generate a unique storage key
-      # TODO: Dynamic File Format
-      #
-      def generate_storage_path
-        update_column(:file, File.join("#{id}".reverse!,
-          driver.to_s, action.to_s, 'request.xml'))
-      end
+    # Generate a unique storage key
+    # TODO: Dynamic File Format
+    #
+    def generate_storage_path
+      update_column(:file, File.join("#{id}".reverse!,
+                                     driver.to_s, action.to_s, 'request.xml'))
+    end
 
-      # Notify the requestable that our status
-      # has changed. This is done by calling
-      # a predefined method name on the
-      # requestable instance
-      #
-      def notify_subscribers
-        return unless should_notify_subscribers?
-        return unless last_response = responses.last
+    # Notify the requestable that our status
+    # has changed. This is done by calling
+    # a predefined method name on the
+    # requestable instance
+    #
+    def notify_subscribers
+      return unless should_notify_subscribers?
+      return unless last_response = responses.last
 
-        to_notify = (subscriptions + (self.respond_to?(:subscribers) ? subscribers : [])).uniq.compact
-        to_notify.each do |subscription|
-          with_logged_exceptions do
-            subscription.handle_conduit_response(action, last_response)
-          end
-        end
-      end
-
-      # Raw access to the action instance
-      #
-      def raw
-        @raw ||= Conduit::Util.find_driver(driver,
-          action).new(options.symbolize_keys!)
-      end
-
-      def should_notify_subscribers?
-        !connection_error? && previous_changes.include?(:status)
-      end
-
-      def with_logged_exceptions(&block)
-        begin
-          yield
-        rescue StandardError => e
-          Rails.logger.error e.message
-          Rails.logger.error e.backtrace.join("\n")
+      to_notify = (subscriptions + (self.respond_to?(:subscribers) ? subscribers : [])).uniq.compact
+      to_notify.each do |subscription|
+        with_logged_exceptions do
+          subscription.handle_conduit_response(action, last_response)
         end
       end
+    end
+
+    # Raw access to the action instance
+    #
+    def raw
+      @raw ||= Conduit::Util.find_driver(driver,
+                                         action).new(options.symbolize_keys!)
+    end
+
+    def should_notify_subscribers?
+      !connection_error? && previous_changes.include?(:status)
+    end
+
+    def with_logged_exceptions(&block)
+      begin
+        yield
+      rescue StandardError => e
+        Rails.logger.error e.message
+        Rails.logger.error e.backtrace.join("\n")
+      end
+    end
   end
 end

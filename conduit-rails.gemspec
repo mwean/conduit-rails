@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   # Dependencies
   #
   s.add_dependency 'conduit', '> 0.5.2'
+  s.add_dependency 'request_store', '~> 1'
   s.add_dependency 'rails'
 
   # Development Dependencies

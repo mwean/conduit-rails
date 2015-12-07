@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'request_store'
 
 describe Conduit::Request do
 
@@ -28,6 +29,13 @@ describe Conduit::Request do
 
     it "creates a response in the database" do
       subject.responses.should_not be_empty
+    end
+
+    it "perserves the transaction id" do
+      RequestStore.store[:transaction_id] = "foo"
+      req = Conduit::Request.create(driver: :my_driver, action: :foo,
+        options: request_attributes)
+      expect(req.transaction_id).to eq("foo")
     end
   end
 
