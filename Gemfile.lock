@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    conduit-rails (1.0.2)
+    conduit-rails (1.0.3)
       conduit (~> 1.0.2)
       rails
       request_store (~> 1)
@@ -36,12 +36,12 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     arel (5.0.1.20140414130214)
-    aws-sdk (2.5.1)
-      aws-sdk-resources (= 2.5.1)
-    aws-sdk-core (2.5.1)
+    aws-sdk (2.5.5)
+      aws-sdk-resources (= 2.5.5)
+    aws-sdk-core (2.5.5)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.5.1)
-      aws-sdk-core (= 2.5.1)
+    aws-sdk-resources (2.5.5)
+      aws-sdk-core (= 2.5.5)
     builder (3.2.2)
     coderay (1.1.0)
     concurrent-ruby (1.0.2)
