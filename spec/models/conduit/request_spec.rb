@@ -65,7 +65,9 @@ describe Conduit::Request do
 
     it 'it notifies the subscriber with response' do
       expect(subscription).to receive(:handle_conduit_response).with(subject.action, response)
-      subject.status = 'success'
+      # mark it dirty so that we'll notify again, the perform_request in the before will have
+      # already notified
+      subject.status_will_change!
       subject.save
     end
 
@@ -81,7 +83,9 @@ describe Conduit::Request do
         expect(second_subscription).to receive(:handle_conduit_response).with(subject.action, response)
         expect(Rails.logger).to receive(:error).twice
 
-        subject.status = 'success'
+        # mark it dirty so that we'll notify again, the perform_request in the before will have
+        # already notified
+        subject.status_will_change!
         subject.save
       end
     end
