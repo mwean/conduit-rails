@@ -6,7 +6,7 @@ module Conduit
       included do
         attr_writer :content
 
-        after_commit  :add_to_storage, on: :create, if: :generate_storage_path
+        after_create  :add_to_storage,      if: :generate_storage_path
         after_destroy :remove_from_storage, if: :file
       end
 
