@@ -13,7 +13,7 @@ describe Conduit::Subscription do
       end
     end
 
-    let (:responder_options) { {some_parameter: 1} }
+    let (:responder_options) { {some_parameter: 1}.stringify_keys }
     subject { Conduit::Subscription.new(responder_type: TestResponder.to_s, responder_options: responder_options)}
 
     it "calls process_conduit_response on the responder" do

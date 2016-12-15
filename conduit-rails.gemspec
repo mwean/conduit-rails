@@ -31,6 +31,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'shoulda-matchers', '~> 2.6'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'rspec-rails', '~> 2.14'
-  s.add_development_dependency 'sqlite3'
+  s.add_development_dependency 'pg'
 
 end

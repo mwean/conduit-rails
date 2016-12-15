@@ -7,6 +7,7 @@ module Conduit
     end
 
     serialize :options, Hash
+    serialize :stored_state, Hash
 
     # Associations
 
@@ -97,6 +98,11 @@ module Conduit
     def subscribe(responder_type, **responder_options)
       raise StandardError.new("Responder must implement process_conduit_response") unless responder_type.respond_to?(:process_conduit_response)
       self.subscriptions.create(responder_type: responder_type.to_s, responder_options: responder_options)
+    end
+
+    def merge_stored_state(additional_state)
+      new_state = stored_state.merge(additional_state)
+      self.stored_state = new_state
     end
 
     private

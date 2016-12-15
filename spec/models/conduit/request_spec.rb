@@ -92,4 +92,9 @@ describe Conduit::Request do
 
   end
 
+  it "can merge additional state into the stored state" do
+    subject.merge_stored_state(additional: "test")
+
+    expect(subject.stored_state).to eql({ additional: "test" })
+  end
 end
