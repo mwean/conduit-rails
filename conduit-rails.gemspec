@@ -21,15 +21,12 @@ Gem::Specification.new do |s|
 
   # Dependencies
   #
-  s.add_dependency 'conduit', '~> 1.1'
-  s.add_dependency 'request_store', '~> 1'
-  s.add_dependency 'rails', '~> 4.2'
+  s.add_dependency "conduit", "~> 1.1.1"
+  s.add_dependency "request_store", "~> 1.2"
+  s.add_dependency "rails", "~> 5.0"
 
-  # Development Dependencies
-  #
-  s.add_development_dependency 'shoulda-matchers', '~> 2.6'
-  s.add_development_dependency 'database_cleaner'
-  s.add_development_dependency 'rspec-rails', '~> 2.14'
-  s.add_development_dependency 'sqlite3'
-
+  s.add_development_dependency "shoulda-matchers"
+  s.add_development_dependency "database_cleaner"
+  s.add_development_dependency "rspec-rails"
+  s.add_development_dependency "sqlite3"
 end
