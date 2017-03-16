@@ -3,5 +3,4 @@ module Conduit::Driver::MyDriver
 
   required_credentials :username, :password
   action :foo
-
 end

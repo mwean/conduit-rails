@@ -1,12 +1,11 @@
 module Conduit
   class Subscription < ActiveRecord::Base
-
     def self.table_name_prefix
-      'conduit_'
+      "conduit_"
     end
 
     belongs_to :subscriber, polymorphic: true
-    belongs_to :request, class_name: 'Conduit::Request'
+    belongs_to :request, class_name: "Conduit::Request"
 
     def handle_conduit_response(action, response)
       if responder_type
@@ -16,6 +15,5 @@ module Conduit
         end
       end
     end
-
   end
 end

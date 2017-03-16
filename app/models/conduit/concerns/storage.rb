@@ -6,7 +6,7 @@ module Conduit
       included do
         attr_writer :content
 
-        after_create  :add_to_storage,      if: :generate_storage_path
+        after_create :add_to_storage
         after_destroy :remove_from_storage, if: :file
       end
 
@@ -18,24 +18,24 @@ module Conduit
 
       private
 
-        # Generate a unique storage key
-        #
-        def generate_storage_path
-          false
-        end
+      # Generate a unique storage key
+      #
+      def generate_storage_path
+        false
+      end
 
-        # Remove the file from remote storage
-        #
-        def remove_from_storage
-          Conduit::Storage.delete(file)
-        end
+      # Remove the file from remote storage
+      #
+      def remove_from_storage
+        Conduit::Storage.delete(file)
+      end
 
-        # Write the content to the storage location
-        #
-        def add_to_storage
+      # Write the content to the storage location
+      #
+      def add_to_storage
+        generate_storage_path &&
           Conduit::Storage.write(file, content)
-        end
-
+      end
     end
   end
 end

@@ -3,7 +3,7 @@ module Conduit
     include Conduit::Concerns::Storage
 
     def self.table_name_prefix
-      'conduit_'
+      "conduit_"
     end
 
     # Associations
@@ -27,17 +27,16 @@ module Conduit
     # Raw access to the parser instance
     #
     def parsed_content
-      @parsed_content ||= Conduit::Util.find_driver(driver, action, 'parser').new(content)
+      @parsed_content ||= Conduit::Util.find_driver(driver, action, "parser").new(content)
     end
 
     private
 
     # Generate a storage key based on parent request
-    # TODO: Dynamic File Format
     #
     def generate_storage_path
-      update_column(:file, File.join(File.dirname(
-        request.file), "#{id}-response.xml"))
+      update_column(:file, File.join(File.dirname(request.file),
+        "#{id}-response.xml"))
     end
 
     # Check for the 'response_status' attribute
@@ -54,12 +53,12 @@ module Conduit
 
     def error_response?
       status = parsed_content.response_status
-      ['error', 'failure'].include?(status)
+      %w(error failure).include?(status)
     end
 
     def set_last_error_message
       errors = parsed_content.try(:response_errors)
-      errors = errors.kind_of?(Array) ? errors.join(',') : errors.to_s
+      errors = errors.is_a?(Array) ? errors.join(",") : errors.to_s
       errors = "An unknown #{parsed_content.response_status} occurred" unless errors.present?
 
       request.update_attributes(last_error_message: errors)

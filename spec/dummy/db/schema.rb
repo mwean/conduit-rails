@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151201151542) do
-
+ActiveRecord::Schema.define(version: 20_151_201_151_542) do
   create_table "conduit_requests", force: true do |t|
     t.string   "driver"
     t.string   "action"
@@ -45,6 +44,5 @@ ActiveRecord::Schema.define(version: 20151201151542) do
   end
 
   add_index "conduit_subscriptions", ["request_id"], name: "index_conduit_subscriptions_on_request_id"
-  add_index "conduit_subscriptions", ["subscriber_type", "subscriber_id"], name: "index_conduit_subscriptions_on_subscriber"
-
+  add_index "conduit_subscriptions", %w(subscriber_type subscriber_id), name: "index_conduit_subscriptions_on_subscriber"
 end

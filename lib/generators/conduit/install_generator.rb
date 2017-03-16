@@ -1,14 +1,14 @@
-require 'rails/generators/migration'
-require 'rails/generators'
-require 'conduit/engine'
-require 'conduit'
+require "rails/generators/migration"
+require "rails/generators"
+require "conduit/engine"
+require "conduit"
 
 class Conduit::InstallGenerator < Rails::Generators::Base
   include Rails::Generators::Migration
   desc "Installs Conduit Models, Migrations, and Controllers."
 
   def self.source_root
-    @source_root ||= File.join(__dir__, '../../../app')
+    @source_root ||= File.join(__dir__, "../../../app")
   end
 
   def copy_controllers
@@ -24,5 +24,4 @@ class Conduit::InstallGenerator < Rails::Generators::Base
   def copy_migrations
     rake("conduit:install:migrations")
   end
-
 end

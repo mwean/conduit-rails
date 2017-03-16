@@ -1,10 +1,8 @@
-require 'spec_helper'
-require 'request_store'
+require "spec_helper"
 
-describe Conduit::Request do
-
+describe Conduit::Request, type: :model do
   let(:xml_request) do
-    read_support_file('xml/xml_request.xml')
+    read_support_file("xml/xml_request.xml")
   end
 
   subject do
@@ -24,7 +22,7 @@ describe Conduit::Request do
     end
 
     it "saves the record to the database" do
-      subject.persisted?.should be_true
+      subject.persisted?.should be true
     end
 
     it "creates a response in the database" do
@@ -35,7 +33,7 @@ describe Conduit::Request do
       RequestStore.store[:transaction_id] = "foo"
       req = Conduit::Request.create(driver: :my_driver, action: :foo,
         options: request_attributes)
-      expect(req.transaction_id).to eq("foo")
+      req.transaction_id.should eq("foo")
     end
   end
 
@@ -43,11 +41,11 @@ describe Conduit::Request do
     before { subject.destroy }
 
     it "removes the record from the database" do
-      subject.destroyed?.should be_true
+      subject.destroyed?.should be true
     end
   end
 
-  describe '#content' do
+  describe "#content" do
     it "returns the xml view" do
       a = subject.content.gsub(/\s+/, "") # Strip whitespace for comparison
       b = xml_request.gsub(/\s+/, "")     # Strip whitespace for comparison
@@ -56,40 +54,39 @@ describe Conduit::Request do
   end
 
   context "with a subscriber" do
-    let (:subscription) { Conduit::Subscription.new }
-    let (:response) { subject.responses.create(content: "some content") }
+    let(:subscription) { Conduit::Subscription.new }
+    let(:response) { subject.responses.create(content: "some content") }
 
     before :each do
       subject.subscriptions << subscription
     end
 
     it 'it notifies the subscriber with response' do
-      expect(subscription).to receive(:handle_conduit_response).with(subject.action, response)
-      # mark it dirty so that we'll notify again, the perform_request in the before will have
-      # already notified
-      subject.status_will_change!
+      subscription.should_receive(:handle_conduit_response).with(subject.action, response)
+      subject.status = "failure"
       subject.save
     end
 
-    context 'with exception in subscriber' do
-      let (:second_subscription) { Conduit::Subscription.new }
+    context "with exception in subscriber" do
+      let(:second_subscription) { Conduit::Subscription.new }
 
       before do
         subject.subscriptions << second_subscription
       end
 
-      it 'notifies subscribers in the face of adversity' do
-        expect(subscription).to receive(:handle_conduit_response).with(subject.action, response).and_raise(StandardError, "boom")
-        expect(second_subscription).to receive(:handle_conduit_response).with(subject.action, response)
-        expect(Rails.logger).to receive(:error).twice
+      it "notifies subscribers in the face of adversity" do
+        subscription.should_receive(:handle_conduit_response).
+                     with(subject.action, response).
+                     and_raise(StandardError, "boom")
 
-        # mark it dirty so that we'll notify again, the perform_request in the before will have
-        # already notified
-        subject.status_will_change!
+        second_subscription.should_receive(:handle_conduit_response).
+                            with(subject.action, response)
+
+        Rails.logger.should_receive(:error).twice
+
+        subject.status = "failure"
         subject.save
       end
     end
-
   end
-
 end

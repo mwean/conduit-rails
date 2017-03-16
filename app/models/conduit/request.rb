@@ -3,18 +3,18 @@ module Conduit
     include Conduit::Concerns::Storage
 
     def self.table_name_prefix
-      'conduit_'
+      "conduit_"
     end
 
     serialize :options, Hash
 
     # Associations
 
-    has_many :responses,   dependent: :destroy
+    has_many :responses, dependent: :destroy
     has_many :subscriptions, autosave: true
 
-    has_many   :children, class_name: 'Conduit::Request', foreign_key: :parent_id
-    belongs_to :parent,   class_name: 'Conduit::Request'
+    has_many   :children, class_name: "Conduit::Request", foreign_key: :parent_id
+    belongs_to :parent,   class_name: "Conduit::Request"
 
     # Validations
 
@@ -24,16 +24,15 @@ module Conduit
 
     # Hooks
 
-    after_initialize  :set_defaults
-    after_commit      :notify_subscribers, on: [:update]
-
-    before_save       :set_transaction_id, on: [:create]
+    after_initialize :set_defaults
+    before_save :set_transaction_id, on: [:create]
+    after_update_commit :notify_subscribers
 
     # Scopes
 
-    scope :by_action, -> (actions) { where(action: actions) }
-    scope :by_driver, -> (drivers) { where(driver: drivers) }
-    scope :by_status, -> (status)  { where(status: status)  }
+    scope :by_action, ->(actions) { where(action: actions) }
+    scope :by_driver, ->(drivers) { where(driver: drivers) }
+    scope :by_status, ->(status)  { where(status: status)  }
 
     # Methods
 
@@ -86,7 +85,7 @@ module Conduit
     end
 
     def callback_url=(callback_url)
-      options.merge!(callback_url: callback_url)
+      options[:callback_url] = callback_url
       attribute_will_change!(:options)
     end
 
@@ -95,8 +94,8 @@ module Conduit
     end
 
     def subscribe(responder_type, **responder_options)
-      raise StandardError.new("Responder must implement process_conduit_response") unless responder_type.respond_to?(:process_conduit_response)
-      self.subscriptions.create(responder_type: responder_type.to_s, responder_options: responder_options)
+      raise StandardError, "Responder must implement process_conduit_response" unless responder_type.respond_to?(:process_conduit_response)
+      subscriptions.create(responder_type: responder_type.to_s, responder_options: responder_options)
     end
 
     private
@@ -107,7 +106,6 @@ module Conduit
       end
       true
     end
-
 
     def conduit_driver
       @conduit_driver ||= Conduit::Util.find_driver(driver)
@@ -125,12 +123,10 @@ module Conduit
       end
     end
 
-
-
     # Set some default values
     #
     def set_defaults
-      self.status ||= 'open'
+      self.status ||= "open"
     end
 
     def connection_error?
@@ -138,11 +134,10 @@ module Conduit
     end
 
     # Generate a unique storage key
-    # TODO: Dynamic File Format
     #
     def generate_storage_path
-      update_column(:file, File.join("#{id}".reverse!,
-                                     driver.to_s, action.to_s, 'request.xml'))
+      update_column(:file, File.join(id.to_s.reverse!,
+        driver.to_s, action.to_s, "request.xml"))
     end
 
     # Notify the requestable that our status
@@ -154,7 +149,7 @@ module Conduit
       return unless should_notify_subscribers?
       return unless last_response = responses.last
 
-      to_notify = (subscriptions + (self.respond_to?(:subscribers) ? subscribers : [])).uniq.compact
+      to_notify = (subscriptions + (respond_to?(:subscribers) ? subscribers : [])).uniq.compact
       to_notify.each do |subscription|
         with_logged_exceptions do
           subscription.handle_conduit_response(action, last_response)
@@ -173,13 +168,11 @@ module Conduit
       !connection_error? && previous_changes.include?(:status)
     end
 
-    def with_logged_exceptions(&block)
-      begin
-        yield
-      rescue StandardError => e
-        Rails.logger.error e.message
-        Rails.logger.error e.backtrace.join("\n")
-      end
+    def with_logged_exceptions
+      yield
+    rescue StandardError => e
+      Rails.logger.error e.message
+      Rails.logger.error e.backtrace.join("\n")
     end
   end
 end

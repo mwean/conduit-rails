@@ -1,4 +1,4 @@
-require File.expand_path('../boot', __FILE__)
+require File.expand_path("../boot", __FILE__)
 
 require "active_record/railtie"
 require "action_controller/railtie"
@@ -7,7 +7,7 @@ require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
-require 'conduit-rails'
+require "conduit-rails"
 
 module Dummy
   class Application < Rails::Application
@@ -23,7 +23,6 @@ module Dummy
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
 
-    config.autoload_paths += %W(app/workers)
+    config.autoload_paths += %w(app/workers)
   end
 end
-

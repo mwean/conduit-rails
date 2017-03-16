@@ -1,7 +1,6 @@
-require 'spec_helper'
+require "spec_helper"
 
-describe Conduit::Response do
-
+describe Conduit::Response, type: :model do
   before do
     Excon.stub({}, body: read_support_file("xml/xml_response.xml"), status: 200)
 
@@ -11,7 +10,7 @@ describe Conduit::Response do
   end
 
   let(:xml_response) do
-    read_support_file('xml/xml_response.xml')
+    read_support_file("xml/xml_response.xml")
   end
 
   subject { @request.responses.first }
@@ -22,7 +21,7 @@ describe Conduit::Response do
     end
 
     it "saves the record to the database" do
-      subject.persisted?.should be_true
+      subject.persisted?.should be true
     end
   end
 
@@ -30,11 +29,11 @@ describe Conduit::Response do
     before { subject.destroy }
 
     it "removes the record from the database" do
-      subject.destroyed?.should be_true
+      subject.destroyed?.should be true
     end
   end
 
-  describe '#content' do
+  describe "#content" do
     it "returns the xml view" do
       a = subject.content.gsub(/\s+/, "") # Strip whitespace for comparison
       b = xml_response.gsub(/\s+/, "")    # Strip whitespace for comparison
@@ -49,35 +48,35 @@ describe Conduit::Response do
     end
   end
 
-  describe '.set_last_error_message' do
-    it 'should set the last error message on the conduit request' do
+  describe ".set_last_error_message" do
+    it "should set the last error message on the conduit request" do
       allow_any_instance_of(Conduit::Response).to receive(:error_response?).and_return(true)
-      allow_any_instance_of(Conduit::Response).to receive(:parsed_content).and_return(OpenStruct.new(response_status: 'error', response_errors: ['boom']))
+      allow_any_instance_of(Conduit::Response).to receive(:parsed_content).and_return(OpenStruct.new(response_status: "error", response_errors: ["boom"]))
 
       @request.responses.create(content: "some content")
 
-      expect(@request.reload.last_error_message).to eql 'boom'
+      @request.reload.last_error_message.should eql "boom"
     end
 
-    it 'should set the last error message on the conduit request with generic message if no response errors' do
+    it "should set the last error message on the conduit request with generic message if no response errors" do
       allow_any_instance_of(Conduit::Response).to receive(:error_response?).and_return(true)
-      allow_any_instance_of(Conduit::Response).to receive(:parsed_content).and_return(OpenStruct.new(response_status: 'error', response_errors: ''))
+      allow_any_instance_of(Conduit::Response).to receive(:parsed_content).and_return(OpenStruct.new(response_status: "error", response_errors: ""))
 
       @request.responses.create(content: "some content")
 
-      expect(@request.reload.last_error_message).to eql 'An unknown error occurred'
-    end    
+      @request.reload.last_error_message.should eql "An unknown error occurred"
+    end
   end
 
-  describe '.wipe_last_error_message' do
-    before { @request.update_attributes(last_error_message: 'boom') }
+  describe ".wipe_last_error_message" do
+    before { @request.update_attributes(last_error_message: "boom") }
 
-    it 'should wip the last error message when its not a error' do
-      expect(@request.last_error_message).to eql 'boom'
+    it "should wip the last error message when its not a error" do
+      @request.last_error_message.should eql "boom"
 
       @request.responses.create(content: "some content")
 
-      expect(@request.reload.last_error_message).to eql nil
+      @request.reload.last_error_message.should eql nil
     end
-  end  
+  end
 end
