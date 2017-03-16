@@ -18,7 +18,7 @@ describe Conduit::Subscription, type: :model do
 
     it "calls process_conduit_response on the responder" do
       TestResponder.should_receive(:process_conduit_response).
-                    with(action, response, responder_options.to_s)
+                    with(action, response, responder_options)
       subject.handle_conduit_response(action, response)
     end
   end
