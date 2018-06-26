@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-ruby '2.4.0'
+ruby '2.5.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '5.1.0'
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+gem "pg", "~> 0.18"
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
@@ -15,9 +15,9 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 
-gem 'acts-as-taggable-on', git: 'https://github.com/mbleigh/acts-as-taggable-on'
+gem 'acts-as-taggable-on', '~> 5.0.0'
 gem 'acts_as_follower'
-gem 'devise', git: 'https://github.com/gogovan/devise.git', branch: 'rails-5.1'
+gem 'devise', '~> 4.4.0'
 gem 'jwt', '~> 1.5.4'
 gem 'puma'
 gem 'rack-cors', '~> 0.4.0'
@@ -35,6 +35,8 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
   gem 'listen'
+
+  gem "dotenv-rails"
 end
 
 group :development do
